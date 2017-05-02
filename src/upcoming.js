@@ -51,7 +51,7 @@
   }
 
   const defaults = {
-    dayLabelFormat: { weekday: "long", month: "long", day: "numeric" },
+    dayLabelFormat: { weekday: 'long', month: 'long', day: 'numeric' },
     error: function(e) {
       const cause = e.cause ? e.cause.statusText : e.message;
       const prefix = 'Unable to display the upcoming events due to an error';
@@ -61,7 +61,7 @@
     orderBy: 'starttime',
     period: 7,
     template: defaultTemplate,
-    timeFormat: { hour: "numeric", minute: "numeric" }
+    timeFormat: { hour: 'numeric', minute: 'numeric' }
   };
 
   // TODO: Investigate using a real class.
