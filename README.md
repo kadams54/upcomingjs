@@ -2,7 +2,7 @@
 
 Displays upcoming events from public Google calendars in a customizable fashion.
 
-* Free software: [MIT License](http://kadams54.mit-license.org/)
+* Free software: [Apache License](https://github.com/kadams54/upcomingjs/blob/master/LICENSE)
 * History: [HISTORY.md](https://github.com/kadams54/upcomingjs/blob/master/HISTORY.md)
 * How to contribute: [CONTRIBUTING.md](https://github.com/kadams54/upcomingjs/blob/master/CONTRIBUTING.md)
 
@@ -24,25 +24,57 @@ To try out the demo locally:
 
 ## Usage
 
-1. Include dependencies:
-
-	```html
-	<script src="TODO"></script>
-	```
-
-2. Include plugin's code:
+1. Include the code:
 
 	```html
 	<script src="upcoming.min.js"></script>
 	```
 
-3. Call the plugin:
+2. Call upcomingjs:
 
 	```javascript
-	window.upcoming("#my-upcoming", {
-		propertyName: "a custom value"
-	});
+	window.upcomingjs(
+    '#my-upcoming',  // Element selector
+    'MY GOOGLE CALENDAR API KEY',  // Google Calendar API key
+    'MY CALENDAR ID'  // Google Calendar ID
+	);
 	```
+
+Upcoming.js requires three pieces of information, passed in as the three
+parameters above:
+
+1. The selector for the DOM element into which Upcoming.js should render
+   the event list.
+2. Your Google Calendar API key.
+3. The public calendar's ID - note that the calendar *must* be made
+   public.
+
+The first bit of information, the DOM selector, is easy. Unfortunately
+the last two require a bit of work.
+
+### Obtaining Your Google Calendar API Key
+
+Hat tip to [Full Calendar](https://fullcalendar.io/) for [these instructions](https://fullcalendar.io/docs/google_calendar/):
+
+1. Go to the [Google Developer Console](https://console.developers.google.com/)
+   and create a new project (it might take a second).
+2. Once in the project, go to **APIs & auth > APIs** on the sidebar.
+3. Find "Calendar API" in the list and turn it ON.
+4. On the sidebar, click **APIs & auth > Credentials**.
+5. In the "Public API access" section, clikc "Create new Key".
+6. Choose "Browser key".
+7. If you know what domains will host your calendar, enter them into the
+   box. Otherwise, leave it blank. You can always change it later.
+8. Your new API key will appear. It might take a second or two before it
+   starts working.
+
+### Making Your Google Calendar Public
+
+TODO
+
+### Finding Your Google Calendar ID
+
+TODO
 
 ## Team
 

@@ -1,12 +1,12 @@
 {
-  "name": "upcoming",
+  "name": "upcomingjs",
   "repo": "kadams54/upcomingjs",
   "description": "",
   "version": "1.0.0",
   "keywords": [],
   "dependencies": {},
   "development": {},
-  "license": "",
+  "license": "Apache",
   "main": "dist/upcoming.js",
   "scripts": [
     "dist/upcoming.js"
