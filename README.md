@@ -8,8 +8,8 @@ Displays upcoming events from public Google calendars in a customizable fashion.
 
 ## Demo
 
-Check out the [live demo](http://kadams54.github.io/upcomingjs/demo/) or try
-out the demo locally:
+Check out the [live demo](http://kadams54.github.io/upcomingjs/demo/) or run the
+demo locally:
 
 1. Make sure you have NPM and Grunt installed.
 2. Set up Upcoming.js and run it:
