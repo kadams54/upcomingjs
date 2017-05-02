@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Upcoming.js</title>
+    <link href="../src/upcoming.css" rel="stylesheet">
+    <style type="text/css">
+      body { font-family: Helvetica, sans-serif; padding: 1em; margin: 0; }
+      h1 { margin: 0 0 1em 0; text-align: center; }
+      .upcomingjs { width: 98%; max-width: 400px; margin: 0 auto; }
+    </style>
+  </head>
+  <body>
+    <h1>Upcoming.js Demo</h1>
+    <div id="my-upcoming" class="upcoming"></div>
+    <script src="../src/upcoming.js"></script>
+    <script>
+      window.upcomingjs(
+        "#my-upcoming",
+        'AIzaSyAvfPUdLY-n6fVGiVppoclfd4PL_GzfG-A',  // API key
+        '9f91mn7j8jkatbpp9bj8li74ng%40group.calendar.google.com'  // Calendar ID
+      );
+    </script>
+  </body>
+</html>

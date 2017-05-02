@@ -1,0 +1,39 @@
+{
+  "name": "upcomingjs",
+  "title": "Upcoming.js",
+  "description": "Displays upcoming events from public Google calendars in a customizable fashion.",
+  "author": "Kyle Adams",
+  "homepage": "https://github.com/kadams54/upcomingjs/",
+  "version": "1.0.0",
+  "devDependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-preset-env": "^1.4.0",
+    "eslint": "^3.19.0",
+    "eslint-config-standard": "^10.2.1",
+    "eslint-plugin-promise": "^3.5.0",
+    "eslint-plugin-standard": "^3.0.1",
+    "grunt": "~0.4.1",
+    "grunt-babel": "^6.0.0",
+    "grunt-cli": "~0.1.7",
+    "grunt-contrib-coffee": "~0.7.0",
+    "grunt-contrib-concat": "~0.3.0",
+    "grunt-contrib-connect": "~0.5.0",
+    "grunt-contrib-cssmin": "~0.6.1",
+    "grunt-contrib-eslint": "0.0.5",
+    "grunt-contrib-uglify": "^0.2.7",
+    "gruntify-eslint": "^3.1.0"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "http://www.opensource.org/licenses/mit-license.php"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/kadams54/upcomingjs.git"
+  },
+  "scripts": {
+    "test": "grunt travis --verbose"
+  }
+}

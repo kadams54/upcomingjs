@@ -1,0 +1,17 @@
+{
+  "name": "upcoming",
+  "repo": "kadams54/upcomingjs",
+  "description": "",
+  "version": "1.0.0",
+  "keywords": [],
+  "dependencies": {},
+  "development": {},
+  "license": "",
+  "main": "dist/upcoming.js",
+  "scripts": [
+    "dist/upcoming.js"
+  ],
+  "styles": [
+    "dist/upcoming.css"
+  ]
+}
