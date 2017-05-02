@@ -221,14 +221,16 @@
       let end, endLabel, start, startLabel, updated;
       try {
         start = new Date(item.start.dateTime);
-        startLabel = start.toLocaleTimeString(settings.locale, timeFormat);
+        startLabel = start.toLocaleTimeString(settings.locale,
+          settings.timeFormat);
       } catch(e) {
         start = null;
         startLabel = '';
       }
       try {
         end = new Date(item.end.dateTime);
-        endLabel = end.toLocaleTimeString(settings.locale, timeFormat);
+        endLabel = end.toLocaleTimeString(settings.locale,
+          settings.timeFormat);
       } catch(e) {
         end = null;
         endLabel = '';
