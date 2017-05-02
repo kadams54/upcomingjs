@@ -10,19 +10,15 @@
         <% if (!days.length) { %>
         <div class="upcomingjs__no-events">No upcoming events found.</div>
         <% } else { %>
-        <% const timeFormat = { hour: "numeric", minute: "numeric" }; %>
-        <% const dayFormat = { weekday: "long", month: "long", day: "numeric" }; %>
         <% days.forEach(day => { %>
         <div class="upcomingjs__day-header">
-          <%= day.date.toLocaleDateString(settings.locale, dayFormat) %>
+          <%=day.label%>
         </div>
         <div class="upcomingjs__day-events">
           <% day.events.forEach(event => { %>
-          <% const eventStart = event.start.toLocaleTimeString(settings.locale, timeFormat); %>
-          <% const eventEnd = event.end.toLocaleTimeString(settings.locale, timeFormat); %>
           <div class="upcomingjs__event">
             <div class="upcomingjs__event-time">
-              <abbr title="<%= event.start.toISOString() %>" class="upcomingjs__event-start"><%=eventStart%></abbr>&#8211;<abbr title="<%=event.end.toISOString()%>" class="upcomingjs__event-end"><%=eventEnd%></abbr>
+              <abbr title="<%=event.start.toISOString()%>" class="upcomingjs__event-start"><%=event.startLabel%></abbr>&#8211;<abbr title="<%=event.end.toISOString()%>" class="upcomingjs__event-end"><%=event.endLabel%></abbr>
             </div>
             <div class="upcomingjs__event-info">
               <a class="upcomingjs__event-summary" href="<%=event.htmlLink%>"><%=event.summary%></a>
@@ -55,6 +51,7 @@
   }
 
   const defaults = {
+    dayLabelFormat: { weekday: "long", month: "long", day: "numeric" },
     error: function(e) {
       const cause = e.cause ? e.cause.statusText : e.message;
       const prefix = 'Unable to display the upcoming events due to an error';
@@ -63,7 +60,8 @@
     loadingIndicator: '<em>Loading&#8230;</em>',
     orderBy: 'starttime',
     period: 7,
-    template: defaultTemplate
+    template: defaultTemplate,
+    timeFormat: { hour: "numeric", minute: "numeric" }
   };
 
   // TODO: Investigate using a real class.
@@ -75,8 +73,12 @@
    *   be rendered.
    * @param {string} apiKey - Your Google Calendar API key.
    * @param {string} calendarId - Your Google Calendar ID.
-   * @param {Object} [options] - A configuration object where Upcoming's behavior
-   *   can be tweaked.
+   * @param {Object} [options] - A configuration object where Upcoming's
+   *   behavior can be tweaked.
+   * @param {Object} [options.dayLabelFormat] - options for formatting the day
+   *   labels displayed in the events listing. These options are sent directly
+   *   to Javascript's toLocaleDateString function; see MDN's documentation for
+   *   more details: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toLocaleDateString#Using_options
    * @param {Function} [options.error] - A function for handling any errors;
    *   the default function displays a short error message in place of the
    *   events.
@@ -95,14 +97,16 @@
    *   template used to render the events. Right now Upcoming.js uses John
    *   Resig's micro-templating markup. For more information, see his blog
    *   post: https://johnresig.com/blog/javascript-micro-templating/
+   * @param {Object} [options.timeFormat] - options for formatting the times
+   *   displayed in the events listing. These options are sent directly to
+   *   Javascript's toLocaleTimeString function; see MDN's documentation for
+   *   more details: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toLocaleTimeString#Using_options
    */
   function Upcoming(elementSelector, apiKey, calendarId, options) {
     this.element = document.querySelector(elementSelector);
     this.apiKey = apiKey;
     this.calendarId = calendarId;
     this.settings = extend({}, defaults, options);
-    this._defaults = defaults;
-    this._name = 'upcoming';
     this.init();
   }
 
@@ -209,16 +213,25 @@
     eventMapper: function(item) {
       // Documentation on Google's JSON:
       // https://developers.google.com/google-apps/calendar/v3/reference/events/list
-      let end, start, updated;
+      const settings = this.settings;
+      // Parse each of the dates in a safe manner; null out the date and
+      // proceed if there are errors. This approach minimizes impact on the
+      // visitor; depending on the template being used, we may still be able
+      // to render an event without an end or updated date.
+      let end, endLabel, start, startLabel, updated;
       try {
         start = new Date(item.start.dateTime);
+        startLabel = start.toLocaleTimeString(settings.locale, timeFormat);
       } catch(e) {
         start = null;
+        startLabel = '';
       }
       try {
         end = new Date(item.end.dateTime);
+        endLabel = end.toLocaleTimeString(settings.locale, timeFormat);
       } catch(e) {
         end = null;
+        endLabel = '';
       }
       try {
         updated = new Date(item.updated);
@@ -228,11 +241,13 @@
       return {
         description: item.description,
         end: end,
+        endLabel: endLabel,
         htmlLink: item.htmlLink,
         id: item.id,
         location: item.location,
         organizer: item.organizer,
         start: start,
+        startLabel: startLabel,
         status: item.status,  // tentative, confirmed, cancelled
         summary: item.summary,
         updated: updated
@@ -249,27 +264,28 @@
      * @param {Object} data - The data with which to populate the template.
      */
     render: function(template, data){
+      // Convert the template into pure JavaScript.
+      const tmpl = template
+        .replace(/[\r\t\n]/g, ' ')
+        .split('<%').join('\t')
+        .replace(/((^|%>)[^\t]*)'/g, '$1\r')
+        .replace(/\t=(.*?)%>/g, '\',$1,\'')
+        .split('\t').join('\');')
+        .split('%>').join('p.push(\'')
+        .split('\r').join('\\\'');
+      const fnBody = `
+        const p = [], print = function() {
+          p.push.apply(p, arguments);
+        };
+        // Introduce the data as local variables using with(){}.
+        with(obj) {
+          p.push('${tmpl}');
+        }
+        return p.join('');
+      `;
       // Generate a reusable function that will serve as a template
       // generator.
-      const fn = new Function('obj',
-        'var p=[],print=function(){p.push.apply(p,arguments);};' +
-
-        // Introduce the data as local variables using with(){}.
-        'with(obj){p.push(\'' +
-
-        // Convert the template into pure JavaScript.
-        template
-            .replace(/[\r\t\n]/g, ' ')
-            .split('<%').join('\t')
-            .replace(/((^|%>)[^\t]*)'/g, '$1\r')
-            .replace(/\t=(.*?)%>/g, '\',$1,\'')
-            .split('\t').join('\');')
-            .split('%>').join('p.push(\'')
-            .split('\r').join('\\\'') +
-
-        '\');}return p.join("");'
-      );
-
+      const fn = new Function('obj', fnBody);
       return fn(data);
     },
 
@@ -285,7 +301,8 @@
      * @param {Object} feed - The feed being parsed.
      */
     parseFeed: function(url, feed) {
-      const error = this.settings.error.bind(this);
+      const settings = this.settings;
+      const error = settings.error.bind(this);
 
       // Validate that we're deeling with a valid feed.
       if (!feed || !feed.items) {
@@ -295,7 +312,7 @@
       const items = feed.items;
       const data = {
         days: [],
-        settings: this.settings
+        settings: settings
       };
       if (items.length) {
         // Convert feed items to our event object.
@@ -319,6 +336,9 @@
           date.setMilliseconds(0);
           this.date = date;
           this.events = events || [];
+          // A user-friendly representation of the Day's date.
+          this.label = date.toLocaleDateString(settings.locale,
+            settings.dayLabelFormat);
         };
         let currentDay = new Day();
         try {
@@ -337,7 +357,7 @@
 
       // Combine the data structure with the HTML template and presto-chango.
       try {
-        this.element.innerHTML = this.render(this.settings.template, data);
+        this.element.innerHTML = this.render(settings.template, data);
       } catch(e) {
         error(e);
       }
